@@ -11,9 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { UserCircle, Download, LogOut } from "lucide-react"
+import { UserCircle, Download, LogOut, Shield } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { disablePin, isPinEnabled } from "@/lib/pin-auth"
 
 interface ProfileMenuProps {
   user: User
@@ -22,9 +23,11 @@ interface ProfileMenuProps {
 export function ProfileMenu({ user }: ProfileMenuProps) {
   const router = useRouter()
   const [isExporting, setIsExporting] = useState(false)
+  const [pinEnabled, setPinEnabled] = useState(isPinEnabled())
 
   const handleSignOut = async () => {
     const supabase = createClient()
+    disablePin()
     await supabase.auth.signOut()
     router.push("/auth/login")
   }
@@ -59,6 +62,16 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
     setIsExporting(false)
   }
 
+  const handleTogglePin = () => {
+    if (pinEnabled) {
+      disablePin()
+      setPinEnabled(false)
+    } else {
+      // Redirect to login to set up new PIN
+      router.push("/auth/login")
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -82,6 +95,10 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         <DropdownMenuItem onClick={handleExport} disabled={isExporting} className="cursor-pointer">
           <Download className="mr-2 h-4 w-4" />
           <span>{isExporting ? "Exporting..." : "Export Vault"}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleTogglePin} className="cursor-pointer">
+          <Shield className="mr-2 h-4 w-4" />
+          <span>{pinEnabled ? "Disable PIN" : "Enable PIN"}</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-400 focus:text-red-400">
           <LogOut className="mr-2 h-4 w-4" />

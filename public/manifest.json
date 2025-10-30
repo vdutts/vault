@@ -2,23 +2,46 @@
   "name": "Vault - Secure Password Manager",
   "short_name": "Vault",
   "description": "Manage your passwords, notes, and checklists securely",
-  "start_url": "/",
+  "start_url": "/vault",
   "display": "standalone",
   "background_color": "#272822",
   "theme_color": "#272822",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192.jpg",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.jpg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Login",
+      "short_name": "Login",
+      "description": "Add a new login",
+      "url": "/vault?type=login",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Add Note",
+      "short_name": "Note",
+      "description": "Add a new note",
+      "url": "/vault?type=note",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Add Checklist",
+      "short_name": "Checklist",
+      "description": "Add a new checklist",
+      "url": "/vault?type=checklist",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
