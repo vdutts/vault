@@ -3,11 +3,12 @@
 import { useState } from "react"
 import type { VaultItem } from "./vault-layout"
 import { Button } from "@/components/ui/button"
-import { X, Copy, Eye, EyeOff, Pencil, Trash2, Check, Plus } from "lucide-react"
+import { X, Copy, Eye, EyeOff, Pencil, Trash2, Check, Plus, ExternalLink } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { EditItemDialog } from "./edit-item-dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import Image from "next/image"
 
 interface VaultItemDetailProps {
   item: VaultItem
@@ -96,6 +97,18 @@ export function VaultItemDetail({ item, onClose, onUpdate, onDelete }: VaultItem
     }
   }
 
+  const getFaviconUrl = (url: string | null) => {
+    if (!url) return null
+    try {
+      const domain = new URL(url.startsWith("http") ? url : `https://${url}`).hostname
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
+    } catch {
+      return null
+    }
+  }
+
+  const faviconUrl = getFaviconUrl(item.website_url)
+
   return (
     <>
       <div className="w-96 border-l border-border bg-card p-6 overflow-y-auto">
@@ -171,27 +184,52 @@ export function VaultItemDetail({ item, onClose, onUpdate, onDelete }: VaultItem
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-medium text-muted-foreground">Website</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2"
-                  onClick={() => copyToClipboard(item.website_url!, "website")}
-                >
-                  {copiedField === "website" ? (
-                    <Check className="h-3 w-3 text-green-600" />
-                  ) : (
-                    <Copy className="h-3 w-3" />
-                  )}
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2"
+                    onClick={() => window.open(item.website_url!, "_blank")}
+                    title="Open website"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2"
+                    onClick={() => copyToClipboard(item.website_url!, "website")}
+                  >
+                    {copiedField === "website" ? (
+                      <Check className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
               </div>
-              <a
-                href={item.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline break-all"
-              >
-                {item.website_url}
-              </a>
+              <div className="flex items-center gap-2">
+                {faviconUrl && (
+                  <Image
+                    src={faviconUrl || "/placeholder.svg"}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="rounded-sm flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none"
+                    }}
+                  />
+                )}
+                <a
+                  href={item.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline break-all"
+                >
+                  {item.website_url}
+                </a>
+              </div>
             </div>
           )}
 

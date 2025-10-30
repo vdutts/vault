@@ -3,11 +3,12 @@
 import type { User } from "@supabase/supabase-js"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Key, FileText, ListChecks, LogOut, Download } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { Search, Key, FileText, ListChecks, Shield } from "lucide-react"
 import type { VaultItemType } from "./vault-layout"
+import { ProfileMenu } from "./profile-menu"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 
 interface VaultSidebarProps {
   user: User
@@ -70,7 +71,10 @@ export function VaultSidebar({
       <div className="w-64 border-r border-border/50 glass flex flex-col">
         <div className="p-4 border-b border-border/50">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold tracking-tight">Vault</h1>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <h1 className="text-xl font-semibold tracking-tight">Vault</h1>
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -78,7 +82,7 @@ export function VaultSidebar({
               title="Sign out"
               className="hover:bg-white/10 transition-all duration-200"
             >
-              <LogOut className="h-4 w-4" />
+              <Shield className="h-4 w-4" />
             </Button>
           </div>
           <div className="relative">
@@ -136,17 +140,8 @@ export function VaultSidebar({
           </div>
         </div>
 
-        <div className="p-3 border-t border-border/50 space-y-2">
-          <Button
-            variant="outline"
-            className="w-full glass-input border-border/50 hover:bg-white/5 transition-all duration-200 bg-transparent"
-            onClick={handleExport}
-            disabled={isExporting}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {isExporting ? "Exporting..." : "Export"}
-          </Button>
-          <p className="text-xs text-muted-foreground text-center truncate px-2">{user.email}</p>
+        <div className="p-3 border-t border-border/50 flex justify-center">
+          <ProfileMenu user={user} />
         </div>
       </div>
     </>
