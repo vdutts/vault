@@ -74,37 +74,47 @@ export function VaultSidebar({
 
   return (
     <>
-      <div className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
+      <div className="w-64 border-r border-border/50 glass flex flex-col">
+        <div className="p-4 border-b border-border/50">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-lg font-semibold">Vault</h1>
-            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
+            <h1 className="text-xl font-semibold tracking-tight">Vault</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSignOut}
+              title="Sign out"
+              className="hover:bg-white/10 transition-all duration-200"
+            >
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search vault..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9"
+              className="pl-9 glass-input border-white/10 focus:border-primary/50"
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex-1 overflow-y-auto p-3">
           <div className="space-y-1">
             <Button
               variant={selectedType === "all" ? "secondary" : "ghost"}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                selectedType === "all" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+              }`}
               onClick={() => onTypeChange("all")}
             >
               All Items
             </Button>
             <Button
               variant={selectedType === "login" ? "secondary" : "ghost"}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                selectedType === "login" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+              }`}
               onClick={() => onTypeChange("login")}
             >
               <Key className="mr-2 h-4 w-4" />
@@ -112,7 +122,9 @@ export function VaultSidebar({
             </Button>
             <Button
               variant={selectedType === "note" ? "secondary" : "ghost"}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                selectedType === "note" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+              }`}
               onClick={() => onTypeChange("note")}
             >
               <FileText className="mr-2 h-4 w-4" />
@@ -120,7 +132,9 @@ export function VaultSidebar({
             </Button>
             <Button
               variant={selectedType === "checklist" ? "secondary" : "ghost"}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                selectedType === "checklist" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+              }`}
               onClick={() => onTypeChange("checklist")}
             >
               <ListChecks className="mr-2 h-4 w-4" />
@@ -129,16 +143,24 @@ export function VaultSidebar({
           </div>
         </div>
 
-        <div className="p-4 border-t border-border space-y-2">
-          <Button className="w-full" onClick={() => setShowAddDialog(true)}>
+        <div className="p-3 border-t border-border/50 space-y-2">
+          <Button
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30"
+            onClick={() => setShowAddDialog(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Item
           </Button>
-          <Button variant="outline" className="w-full bg-transparent" onClick={handleExport} disabled={isExporting}>
+          <Button
+            variant="outline"
+            className="w-full glass-input border-white/10 hover:bg-white/5 transition-all duration-200 bg-transparent"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
             <Download className="mr-2 h-4 w-4" />
-            {isExporting ? "Exporting..." : "Export Vault"}
+            {isExporting ? "Exporting..." : "Export"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">{user.email}</p>
+          <p className="text-xs text-muted-foreground text-center truncate px-2">{user.email}</p>
         </div>
       </div>
 
