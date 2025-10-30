@@ -53,7 +53,8 @@
   --sidebar-ring: #66d9ef;
 }
 
-@theme inline {
+/* Fixed missing closing brace and proper Tailwind v4 theme configuration */
+@theme {
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 
   --color-background: var(--background);

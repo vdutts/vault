@@ -4,6 +4,9 @@ import { useEffect } from "react"
 
 export function PWARegister() {
   useEffect(() => {
+    // Service workers work better in production deployments
+    // Uncomment below to enable in production:
+    /*
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/sw.js")
@@ -14,6 +17,7 @@ export function PWARegister() {
           console.log("[v0] Service Worker registration failed:", error)
         })
     }
+    */
   }, [])
 
   return null
