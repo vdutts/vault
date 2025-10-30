@@ -3,13 +3,11 @@
 import type React from "react"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, X } from "lucide-react"
+import { Plus, X, ChevronDown, ChevronRight } from "lucide-react"
 import type { VaultItemType } from "./vault-layout"
 
 interface AddItemDialogProps {
@@ -30,6 +28,7 @@ export function AddItemDialog({ open, onOpenChange, onSuccess }: AddItemDialogPr
   const [newChecklistItem, setNewChecklistItem] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleTypeChange = (newType: VaultItemType) => {
     setType(newType)
@@ -124,265 +123,242 @@ export function AddItemDialog({ open, onOpenChange, onSuccess }: AddItemDialogPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl glass border-white/10">
+      <DialogContent className="max-w-lg glass border-border/50 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Add New Item</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Create a new login, note, or checklist
-          </DialogDescription>
+          <DialogTitle className="text-foreground text-lg">Add New Item</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="type" className="text-foreground">
-              Type
-            </Label>
-            <Select value={type} onValueChange={(value) => handleTypeChange(value as VaultItemType)}>
-              <SelectTrigger className="glass-input border-white/10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="glass border-white/10">
-                <SelectItem value="login">Login</SelectItem>
-                <SelectItem value="note">Note</SelectItem>
-                <SelectItem value="checklist">Checklist</SelectItem>
-              </SelectContent>
-            </Select>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={type === "login" ? "default" : "outline"}
+              className={`flex-1 ${type === "login" ? "bg-primary text-primary-foreground" : "glass-input border-border/50"}`}
+              onClick={() => handleTypeChange("login")}
+            >
+              Login
+            </Button>
+            <Button
+              type="button"
+              variant={type === "note" ? "default" : "outline"}
+              className={`flex-1 ${type === "note" ? "bg-primary text-primary-foreground" : "glass-input border-border/50"}`}
+              onClick={() => handleTypeChange("note")}
+            >
+              Note
+            </Button>
+            <Button
+              type="button"
+              variant={type === "checklist" ? "default" : "outline"}
+              className={`flex-1 ${type === "checklist" ? "bg-primary text-primary-foreground" : "glass-input border-border/50"}`}
+              onClick={() => handleTypeChange("checklist")}
+            >
+              Checklist
+            </Button>
+          </div>
+
+          <div>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={getTitlePlaceholder()}
+              className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground text-base h-11"
+              required
+              autoFocus
+            />
           </div>
 
           {type === "login" && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-foreground">
-                  Title
-                </Label>
+              <div>
                 <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={getTitlePlaceholder()}
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">
-                  Username / Email
-                </Label>
-                <Input
-                  id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="user@example.com"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
+                  placeholder="Username or email"
+                  className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
-                  Password (optional)
-                </Label>
+              <div>
                 <Input
-                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
+                  placeholder="Password (optional)"
+                  className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="website" className="text-foreground">
-                  Website URL
-                </Label>
-                <Input
-                  id="website"
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showAdvanced ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                More options
+              </button>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags" className="text-foreground">
-                  Tags (comma-separated)
-                </Label>
-                <Input
-                  id="tags"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  placeholder="work, personal, important"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              {showAdvanced && (
+                <div className="space-y-3 animate-fade-in">
+                  <div>
+                    <Input
+                      value={websiteUrl}
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      placeholder="Website URL"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      value={tags}
+                      onChange={(e) => setTags(e.target.value)}
+                      placeholder="Tags (comma-separated)"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
 
           {type === "note" && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-foreground">
-                  Title
-                </Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={getTitlePlaceholder()}
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes" className="text-foreground">
-                  Notes
-                </Label>
+              <div>
                 <Textarea
-                  id="notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Write your note here..."
-                  rows={12}
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground resize-none"
+                  placeholder="Start writing..."
+                  rows={10}
+                  className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground resize-none"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="website" className="text-foreground">
-                  Website URL (optional)
-                </Label>
-                <Input
-                  id="website"
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showAdvanced ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                More options
+              </button>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags" className="text-foreground">
-                  Tags (comma-separated)
-                </Label>
-                <Input
-                  id="tags"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  placeholder="work, personal, important"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              {showAdvanced && (
+                <div className="space-y-3 animate-fade-in">
+                  <div>
+                    <Input
+                      value={websiteUrl}
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      placeholder="Website URL (optional)"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      value={tags}
+                      onChange={(e) => setTags(e.target.value)}
+                      placeholder="Tags (comma-separated)"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
 
           {type === "checklist" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-foreground">
-                  Title
-                </Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={getTitlePlaceholder()}
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-foreground">Checklist Items</Label>
-                <div className="space-y-2">
-                  {checklistItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 glass-input border-white/10 p-2 rounded-lg">
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={() => handleToggleChecklistItem(index)}
-                        className="w-4 h-4 rounded border-white/20 bg-white/5 checked:bg-primary"
-                      />
-                      <span className={`flex-1 text-foreground ${item.completed ? "line-through opacity-50" : ""}`}>
-                        {item.text}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveChecklistItem(index)}
-                        className="h-6 w-6 p-0 hover:bg-destructive/20"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <div className="flex gap-2">
-                    <Input
-                      value={newChecklistItem}
-                      onChange={(e) => setNewChecklistItem(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault()
-                          handleAddChecklistItem()
-                        }
-                      }}
-                      placeholder="Add new item..."
-                      className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
+                {checklistItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 glass-input border-border/50 p-2 rounded-lg group"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={item.completed}
+                      onChange={() => handleToggleChecklistItem(index)}
+                      className="w-4 h-4 rounded border-border bg-input checked:bg-primary transition-all"
                     />
+                    <span className={`flex-1 text-foreground ${item.completed ? "line-through opacity-50" : ""}`}>
+                      {item.text}
+                    </span>
                     <Button
                       type="button"
-                      onClick={handleAddChecklistItem}
+                      variant="ghost"
                       size="sm"
-                      className="bg-primary hover:bg-primary/80"
+                      onClick={() => handleRemoveChecklistItem(index)}
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 transition-all"
                     >
-                      <Plus className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
+                ))}
+                <div className="flex gap-2">
+                  <Input
+                    value={newChecklistItem}
+                    onChange={(e) => setNewChecklistItem(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        handleAddChecklistItem()
+                      }
+                    }}
+                    placeholder="Add item..."
+                    className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddChecklistItem}
+                    size="icon"
+                    className="bg-primary hover:bg-primary/90 shrink-0"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="website" className="text-foreground">
-                  Website URL (optional)
-                </Label>
-                <Input
-                  id="website"
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showAdvanced ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                More options
+              </button>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags" className="text-foreground">
-                  Tags (comma-separated)
-                </Label>
-                <Input
-                  id="tags"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  placeholder="work, personal, important"
-                  className="glass-input border-white/10 text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              {showAdvanced && (
+                <div className="space-y-3 animate-fade-in">
+                  <div>
+                    <Input
+                      value={websiteUrl}
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      placeholder="Website URL (optional)"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      value={tags}
+                      onChange={(e) => setTags(e.target.value)}
+                      placeholder="Tags (comma-separated)"
+                      className="glass-input border-border/50 text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1 glass-input border-white/10 hover:bg-white/10"
+              className="flex-1 glass-input border-border/50 hover:bg-white/5"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="flex-1 bg-primary hover:bg-primary/80">
+            <Button type="submit" disabled={isLoading} className="flex-1 bg-primary hover:bg-primary/90">
               {isLoading ? "Creating..." : "Create"}
             </Button>
           </div>

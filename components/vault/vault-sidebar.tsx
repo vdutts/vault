@@ -3,12 +3,11 @@
 import type { User } from "@supabase/supabase-js"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Key, FileText, ListChecks, LogOut, Plus, Download } from "lucide-react"
+import { Search, Key, FileText, ListChecks, LogOut, Download } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import type { VaultItemType } from "./vault-layout"
 import { useState } from "react"
-import { AddItemDialog } from "./add-item-dialog"
 
 interface VaultSidebarProps {
   user: User
@@ -28,18 +27,12 @@ export function VaultSidebar({
   onRefresh,
 }: VaultSidebarProps) {
   const router = useRouter()
-  const [showAddDialog, setShowAddDialog] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   const handleSignOut = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push("/auth/login")
-  }
-
-  const handleAddSuccess = () => {
-    setShowAddDialog(false)
-    onRefresh()
   }
 
   const handleExport = async () => {
@@ -94,7 +87,7 @@ export function VaultSidebar({
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 glass-input border-white/10 focus:border-primary/50"
+              className="pl-9 glass-input border-border/50 focus:border-primary/50"
             />
           </div>
         </div>
@@ -104,7 +97,7 @@ export function VaultSidebar({
             <Button
               variant={selectedType === "all" ? "secondary" : "ghost"}
               className={`w-full justify-start transition-all duration-200 ${
-                selectedType === "all" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+                selectedType === "all" ? "bg-accent text-foreground" : "hover:bg-white/5"
               }`}
               onClick={() => onTypeChange("all")}
             >
@@ -113,7 +106,7 @@ export function VaultSidebar({
             <Button
               variant={selectedType === "login" ? "secondary" : "ghost"}
               className={`w-full justify-start transition-all duration-200 ${
-                selectedType === "login" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+                selectedType === "login" ? "bg-accent text-foreground" : "hover:bg-white/5"
               }`}
               onClick={() => onTypeChange("login")}
             >
@@ -123,7 +116,7 @@ export function VaultSidebar({
             <Button
               variant={selectedType === "note" ? "secondary" : "ghost"}
               className={`w-full justify-start transition-all duration-200 ${
-                selectedType === "note" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+                selectedType === "note" ? "bg-accent text-foreground" : "hover:bg-white/5"
               }`}
               onClick={() => onTypeChange("note")}
             >
@@ -133,7 +126,7 @@ export function VaultSidebar({
             <Button
               variant={selectedType === "checklist" ? "secondary" : "ghost"}
               className={`w-full justify-start transition-all duration-200 ${
-                selectedType === "checklist" ? "bg-white/10 text-foreground shadow-lg" : "hover:bg-white/5"
+                selectedType === "checklist" ? "bg-accent text-foreground" : "hover:bg-white/5"
               }`}
               onClick={() => onTypeChange("checklist")}
             >
@@ -145,15 +138,8 @@ export function VaultSidebar({
 
         <div className="p-3 border-t border-border/50 space-y-2">
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30"
-            onClick={() => setShowAddDialog(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Item
-          </Button>
-          <Button
             variant="outline"
-            className="w-full glass-input border-white/10 hover:bg-white/5 transition-all duration-200 bg-transparent"
+            className="w-full glass-input border-border/50 hover:bg-white/5 transition-all duration-200 bg-transparent"
             onClick={handleExport}
             disabled={isExporting}
           >
@@ -163,8 +149,6 @@ export function VaultSidebar({
           <p className="text-xs text-muted-foreground text-center truncate px-2">{user.email}</p>
         </div>
       </div>
-
-      <AddItemDialog open={showAddDialog} onOpenChange={setShowAddDialog} onSuccess={handleAddSuccess} />
     </>
   )
 }

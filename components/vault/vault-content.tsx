@@ -5,7 +5,9 @@ import { createClient } from "@/lib/supabase/client"
 import type { VaultItem, VaultItemType } from "./vault-layout"
 import { VaultItemCard } from "./vault-item-card"
 import { VaultItemDetail } from "./vault-item-detail"
-import { Loader2 } from "lucide-react"
+import { Loader2, Plus } from "lucide-react"
+import { AddItemDialog } from "./add-item-dialog"
+import { Button } from "@/components/ui/button"
 
 interface VaultContentProps {
   selectedType: VaultItemType | "all"
@@ -26,6 +28,7 @@ export function VaultContent({
 }: VaultContentProps) {
   const [items, setItems] = useState<VaultItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showAddDialog, setShowAddDialog] = useState(false)
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -75,37 +78,65 @@ export function VaultContent({
   }
 
   return (
-    <div className="flex-1 flex">
-      <div className="flex-1 overflow-y-auto p-6">
-        {items.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground">No items found</p>
-          </div>
-        ) : (
-          <div className="grid gap-3 max-w-4xl">
-            {items.map((item) => (
-              <VaultItemCard
-                key={item.id}
-                item={item}
-                isSelected={selectedItem?.id === item.id}
-                onClick={() => onSelectItem(item)}
-              />
-            ))}
-          </div>
+    <>
+      <div className="flex-1 flex">
+        <div className="flex-1 overflow-y-auto p-6 relative">
+          <Button
+            onClick={() => setShowAddDialog(true)}
+            size="icon"
+            className="absolute top-6 right-6 z-10 h-10 w-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:shadow-xl hover:shadow-primary/40 hover:scale-105"
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+
+          {items.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-4">
+                <p className="text-muted-foreground">No items yet</p>
+                <Button
+                  onClick={() => setShowAddDialog(true)}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create your first item
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-3 max-w-4xl pr-16">
+              {items.map((item) => (
+                <VaultItemCard
+                  key={item.id}
+                  item={item}
+                  isSelected={selectedItem?.id === item.id}
+                  onClick={() => onSelectItem(item)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {selectedItem && (
+          <VaultItemDetail
+            item={selectedItem}
+            onClose={() => onSelectItem(null)}
+            onUpdate={onRefresh}
+            onDelete={() => {
+              onSelectItem(null)
+              onRefresh()
+            }}
+          />
         )}
       </div>
 
-      {selectedItem && (
-        <VaultItemDetail
-          item={selectedItem}
-          onClose={() => onSelectItem(null)}
-          onUpdate={onRefresh}
-          onDelete={() => {
-            onSelectItem(null)
-            onRefresh()
-          }}
-        />
-      )}
-    </div>
+      <AddItemDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        onSuccess={() => {
+          setShowAddDialog(false)
+          onRefresh()
+        }}
+      />
+    </>
   )
 }
